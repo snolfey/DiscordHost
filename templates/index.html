@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DiscordHost</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>☁️ DiscordHost</h1>
+      <p>Hospedagem dos bots dos seus clientes</p>
+    </div>
+    <span class="badge">Limite: {{ bots|length }}/{{ limit }}</span>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, msg in messages %}
+      <div class="alert {{ category }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <section class="card">
+    <h2>➕ Hospedar Bot</h2>
+    <form method="post" action="/bots/create">
+      <input name="name" placeholder="Nome do bot" required>
+      <input name="bot_id" placeholder="ID interno do bot" required>
+      <button>🚀 Criar hospedagem</button>
+    </form>
+    <small>Por segurança, esta versão não recebe nem exibe tokens do Discord.</small>
+  </section>
+
+  <section>
+    <h2>🤖 Seus Bots</h2>
+    {% if bots %}
+      <div class="grid">
+      {% for bot in bots %}
+        <article class="bot">
+          <div class="top">
+            <h3>{{ bot.name }}</h3>
+            <span class="{{ 'online' if bot.status == 'ONLINE' else 'offline' }}">
+              ● {{ bot.status }}
+            </span>
+          </div>
+          <p>ID: {{ bot.id }}</p>
+          <div class="actions">
+            <form method="post" action="/bots/{{ bot.id }}/action"><input type="hidden" name="action" value="start"><button>▶ Iniciar</button></form>
+            <form method="post" action="/bots/{{ bot.id }}/action"><input type="hidden" name="action" value="stop"><button>⏹ Parar</button></form>
+            <form method="post" action="/bots/{{ bot.id }}/action"><input type="hidden" name="action" value="restart"><button>🔄 Reiniciar</button></form>
+            <form method="post" action="/bots/{{ bot.id }}/action"><input type="hidden" name="action" value="remove"><button class="danger">🗑 Remover</button></form>
+          </div>
+        </article>
+      {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty">Nenhum bot hospedado ainda.</div>
+    {% endif %}
+  </section>
+</main>
+</body>
+</html>
